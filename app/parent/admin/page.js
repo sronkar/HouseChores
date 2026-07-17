@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  getKids, listTemplates, listAltChores, getBoard, listExcused, getSetting,
+  getKids, listTemplates, listAltChores, getBoard, listBoardTemplates, listExcused, getSetting,
 } from "@/lib/domain.js";
 import {
   isParent,
@@ -10,6 +10,7 @@ import {
   addAltAction, updateAltAction, deleteAltAction,
   cloneTemplateAction, cloneAltAction, cloneBoardAction,
   addBoardAction, deleteTaskAction,
+  updateBoardTemplateAction, deleteBoardTemplateAction, cloneBoardTemplateAction,
   addExcusedAction, deleteExcusedAction, setPinAction,
 } from "@/app/actions.js";
 
@@ -18,6 +19,27 @@ const CADENCES = [
   { v: "on_completion", label: "On completion — baton passes when done" },
   { v: "weekly", label: "Weekly — new kid each week" },
 ];
+
+const DOW = [
+  { v: 0, s: "Sun" }, { v: 1, s: "Mon" }, { v: 2, s: "Tue" }, { v: 3, s: "Wed" },
+  { v: 4, s: "Thu" }, { v: 5, s: "Fri" }, { v: 6, s: "Sat" },
+];
+function WeekdayChecks({ selected = [] }) {
+  return (
+    <div className="checks">
+      {DOW.map((d) => (
+        <label key={d.v}>
+          <input type="checkbox" name="wd" value={d.v} defaultChecked={selected.includes(d.v)} />
+          {d.s}
+        </label>
+      ))}
+    </div>
+  );
+}
+function dowLabel(arr) {
+  if (!arr || arr.length === 0) return "every day";
+  return arr.map((v) => DOW[v].s).join(", ");
+}
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +64,8 @@ export default async function AdminPage({ searchParams }) {
   const kids = getKids();
   const templates = listTemplates();
   const alts = listAltChores();
-  const board = getBoard();
+  const board = getBoard().filter((t) => !t.board_template_id);
+  const boardTemplates = listBoardTemplates();
   const excused = listExcused();
   const pin = getSetting("parent_pin");
 
@@ -224,13 +247,52 @@ export default async function AdminPage({ searchParams }) {
       ))}
       <div className="card">
         <h3>Post a board task</h3>
-        <form action={addBoardAction} className="row">
-          <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue="📌" /></div>
-          <div><label>Name</label><input type="text" name="name" placeholder="e.g. Take out trash" /></div>
-          <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue="5" min="0" /></div>
-          <button className="btn" type="submit">Post</button>
+        <form action={addBoardAction}>
+          <div className="row">
+            <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue="📌" /></div>
+            <div><label>Name</label><input type="text" name="name" placeholder="e.g. Take out trash" /></div>
+            <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue="5" min="0" /></div>
+          </div>
+          <label>Repeat on (leave empty = one-time)</label>
+          <WeekdayChecks />
+          <div className="row" style={{ marginTop: 12, justifyContent: "flex-end" }}>
+            <button className="btn" type="submit">Post</button>
+          </div>
         </form>
       </div>
+
+      {/* RECURRING BOARD */}
+      <div className="section-title">Recurring board tasks (by weekday)</div>
+      {boardTemplates.length === 0 && (
+        <div className="empty">None yet — add one above by picking repeat days.</div>
+      )}
+      {boardTemplates.map((b) => (
+        <div className="card" key={b.id}>
+          <form action={updateBoardTemplateAction}>
+            <input type="hidden" name="id" value={b.id} />
+            <div className="row">
+              <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue={b.emoji} /></div>
+              <div><label>Name</label><input type="text" name="name" defaultValue={b.name} /></div>
+              <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue={b.points} min="0" /></div>
+            </div>
+            <label>Repeat on — <span className="muted">currently {dowLabel(b.weekdaysArr)}</span></label>
+            <WeekdayChecks selected={b.weekdaysArr} />
+            <div className="row" style={{ marginTop: 12, justifyContent: "flex-end" }}>
+              <button className="btn ghost" type="submit">Save</button>
+            </div>
+          </form>
+          <div style={{ display: "flex", gap: 8, marginTop: -52 }}>
+            <form action={cloneBoardTemplateAction}>
+              <input type="hidden" name="id" value={b.id} />
+              <button className="btn gray" type="submit">Clone</button>
+            </form>
+            <form action={deleteBoardTemplateAction}>
+              <input type="hidden" name="id" value={b.id} />
+              <button className="btn gray" type="submit">Remove</button>
+            </form>
+          </div>
+        </div>
+      ))}
       </>)}
 
       {tab === "kids" && (<>

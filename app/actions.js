@@ -161,13 +161,37 @@ export async function cloneBoardAction(formData) {
 // ---------- admin: board ----------
 export async function addBoardAction(formData) {
   await requireParent();
-  dom.addBoardChore({
+  const name = String(formData.get("name") || "").trim() || "Task";
+  const emoji = String(formData.get("emoji") || "📌");
+  const points = Number(formData.get("points") || 5);
+  const weekdays = formData.getAll("wd").map(Number);
+  if (weekdays.length > 0) {
+    dom.addBoardTemplate({ name, emoji, points, weekdays });
+  } else {
+    dom.addBoardChore({ name, emoji, points });
+  }
+  revalidatePath("/parent/admin");
+  revalidatePath("/parent");
+}
+export async function updateBoardTemplateAction(formData) {
+  await requireParent();
+  dom.updateBoardTemplate(Number(formData.get("id")), {
     name: String(formData.get("name") || "").trim() || "Task",
     emoji: String(formData.get("emoji") || "📌"),
     points: Number(formData.get("points") || 5),
+    weekdays: formData.getAll("wd").map(Number),
   });
   revalidatePath("/parent/admin");
-  revalidatePath("/parent");
+}
+export async function deleteBoardTemplateAction(formData) {
+  await requireParent();
+  dom.deactivateBoardTemplate(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+}
+export async function cloneBoardTemplateAction(formData) {
+  await requireParent();
+  dom.cloneBoardTemplate(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
 }
 export async function deleteTaskAction(formData) {
   await requireParent();
