@@ -1,15 +1,23 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  getKids, listTemplates, getBoard, listExcused, getSetting,
+  getKids, listTemplates, listAltChores, getBoard, listExcused, getSetting,
 } from "@/lib/domain.js";
 import {
   isParent,
   addKidAction, updateKidAction,
   addTemplateAction, updateTemplateAction, deleteTemplateAction,
+  addAltAction, updateAltAction, deleteAltAction,
+  cloneTemplateAction, cloneAltAction, cloneBoardAction,
   addBoardAction, deleteTaskAction,
   addExcusedAction, deleteExcusedAction, setPinAction,
 } from "@/app/actions.js";
+
+const CADENCES = [
+  { v: "daily", label: "Daily — new kid each day" },
+  { v: "on_completion", label: "On completion — baton passes when done" },
+  { v: "weekly", label: "Weekly — new kid each week" },
+];
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +39,7 @@ export default async function AdminPage() {
 
   const kids = getKids();
   const templates = listTemplates();
+  const alts = listAltChores();
   const board = getBoard();
   const excused = listExcused();
   const pin = getSetting("parent_pin");
@@ -94,10 +103,16 @@ export default async function AdminPage() {
               <button className="btn ghost" type="submit">Save</button>
             </div>
           </form>
-          <form action={deleteTemplateAction} style={{ marginTop: -52 }}>
-            <input type="hidden" name="id" value={t.id} />
-            <button className="btn gray" type="submit">Remove</button>
-          </form>
+          <div style={{ display: "flex", gap: 8, marginTop: -52 }}>
+            <form action={cloneTemplateAction}>
+              <input type="hidden" name="id" value={t.id} />
+              <button className="btn gray" type="submit">Clone</button>
+            </form>
+            <form action={deleteTemplateAction}>
+              <input type="hidden" name="id" value={t.id} />
+              <button className="btn gray" type="submit">Remove</button>
+            </form>
+          </div>
         </div>
       ))}
       <div className="card">
@@ -116,6 +131,59 @@ export default async function AdminPage() {
         </form>
       </div>
 
+      {/* ALTERNATING */}
+      <div className="section-title">Alternating chores (rotate between kids)</div>
+      {alts.map((a) => (
+        <div className="card" key={a.id}>
+          <form action={updateAltAction}>
+            <input type="hidden" name="id" value={a.id} />
+            <div className="row">
+              <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue={a.emoji} /></div>
+              <div><label>Name</label><input type="text" name="name" defaultValue={a.name} /></div>
+              <div style={{ flex: "0 0 90px" }}><label>Points</label><input type="number" name="points" defaultValue={a.points} min="0" /></div>
+            </div>
+            <label>Rotation cadence</label>
+            <select name="cadence" defaultValue={a.cadence}>
+              {CADENCES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
+            </select>
+            <label>Rotate between (in order)</label>
+            <KidChecks kids={kids} selected={a.kidIds} />
+            <div className="row" style={{ marginTop: 12, justifyContent: "flex-end" }}>
+              <button className="btn ghost" type="submit">Save</button>
+            </div>
+          </form>
+          <div style={{ display: "flex", gap: 8, marginTop: -52 }}>
+            <form action={cloneAltAction}>
+              <input type="hidden" name="id" value={a.id} />
+              <button className="btn gray" type="submit">Clone</button>
+            </form>
+            <form action={deleteAltAction}>
+              <input type="hidden" name="id" value={a.id} />
+              <button className="btn gray" type="submit">Remove</button>
+            </form>
+          </div>
+        </div>
+      ))}
+      <div className="card">
+        <h3>Add an alternating chore</h3>
+        <form action={addAltAction}>
+          <div className="row">
+            <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue="🔁" /></div>
+            <div><label>Name</label><input type="text" name="name" placeholder="e.g. Walk the dog" /></div>
+            <div style={{ flex: "0 0 90px" }}><label>Points</label><input type="number" name="points" defaultValue="5" min="0" /></div>
+          </div>
+          <label>Rotation cadence</label>
+          <select name="cadence" defaultValue="daily">
+            {CADENCES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
+          </select>
+          <label>Rotate between (in order)</label>
+          <KidChecks kids={kids} />
+          <div className="row" style={{ marginTop: 12, justifyContent: "flex-end" }}>
+            <button className="btn" type="submit">Add rotating chore</button>
+          </div>
+        </form>
+      </div>
+
       {/* BOARD */}
       <div className="section-title">Board — one-off tasks</div>
       {board.map((t) => (
@@ -124,6 +192,10 @@ export default async function AdminPage() {
           <span className="grow"><b>{t.name}</b> <span className="pts">+{t.points_snapshot}</span>
             {t.status === "pending" && <span className="pill pending" style={{ marginLeft: 8 }}>⏳ waiting</span>}
           </span>
+          <form action={cloneBoardAction}>
+            <input type="hidden" name="id" value={t.id} />
+            <button className="btn gray" type="submit">Clone</button>
+          </form>
           <form action={deleteTaskAction}>
             <input type="hidden" name="id" value={t.id} />
             <button className="btn gray" type="submit">Remove</button>

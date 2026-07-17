@@ -58,8 +58,10 @@ function ToddlerCard({ t, kidId }) {
   );
 }
 
-function ToddlerView({ kid, assigned, balance }) {
+function ToddlerView({ kid, assigned, alt = [], balance }) {
   const stars = "⭐".repeat(Math.min(10, Math.max(0, Math.round(balance / 10))));
+  const myTurns = alt.filter((o) => o.ownerKidId === kid.id && o.task && o.task.status !== "approved");
+  const cards = assigned.length + myTurns.length;
   return (
     <main className="wrap toddler">
       <div className="topbar">
@@ -71,10 +73,31 @@ function ToddlerView({ kid, assigned, balance }) {
       </div>
       <div className="tstars">{stars || "⭐"} <span className="tstars-num">{balance}</span></div>
       <div className="tgrid">
-        {assigned.length === 0 && <div className="empty">No chores today! 🎈</div>}
+        {cards === 0 && <div className="empty">No chores today! 🎈</div>}
         {assigned.map((t) => <ToddlerCard key={t.id} t={t} kidId={kid.id} />)}
+        {myTurns.map((o) => <ToddlerCard key={`a${o.alt.id}`} t={o.task} kidId={kid.id} />)}
       </div>
     </main>
+  );
+}
+
+function AltRow({ o, kidId }) {
+  const mine = o.ownerKidId === kidId;
+  const turnLabel = mine ? "Your turn!" : `${o.ownerEmoji} ${o.ownerName}’s turn`;
+  return (
+    <div className="task">
+      <div className="emoji">{o.alt.emoji}</div>
+      <div className="body">
+        <div className="tname">{o.alt.name}</div>
+        <div className="meta">
+          <span className="pts">+{o.alt.points} pts</span>
+          <span className="flame" style={{ color: mine ? "var(--good)" : "var(--muted)" }}>🔁 {turnLabel}</span>
+        </div>
+      </div>
+      {o.isMine && <DoneButton taskId={o.task.id} kidId={kidId} />}
+      {mine && o.task?.status === "pending" && <span className="pill pending">⏳ waiting</span>}
+      {mine && o.task?.status === "approved" && <span className="pill done">✓ done</span>}
+    </div>
   );
 }
 
@@ -83,8 +106,8 @@ export default async function KidPage({ params }) {
   const kidId = Number(id);
   if (!getKid(kidId)) notFound();
 
-  const { kid, assigned, board, balance } = getKidDay(kidId);
-  if (kid.toddler) return <ToddlerView kid={kid} assigned={assigned} balance={balance} />;
+  const { kid, assigned, board, alt, balance } = getKidDay(kidId);
+  if (kid.toddler) return <ToddlerView kid={kid} assigned={assigned} alt={alt} balance={balance} />;
   const doneCount = assigned.filter((t) => t.status === "approved").length;
 
   return (
@@ -108,6 +131,13 @@ export default async function KidPage({ params }) {
       {assigned.map((t) => (
         <TaskRow key={t.id} t={t} kidId={kidId} showStreak />
       ))}
+
+      {alt.length > 0 && (
+        <>
+          <div className="section-title">🔁 Shared jobs — taking turns</div>
+          {alt.map((o) => <AltRow key={o.alt.id} o={o} kidId={kidId} />)}
+        </>
+      )}
 
       <div className="section-title">Up for grabs — anyone can do these</div>
       {board.length === 0 && <div className="empty">Nothing on the board right now. 🎉</div>}

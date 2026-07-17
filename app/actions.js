@@ -105,6 +105,53 @@ export async function deleteTemplateAction(formData) {
   revalidatePath("/parent/admin");
 }
 
+// ---------- admin: alternating (rotating) chores ----------
+export async function addAltAction(formData) {
+  await requireParent();
+  dom.addAltChore({
+    name: String(formData.get("name") || "").trim() || "Chore",
+    emoji: String(formData.get("emoji") || "🔁"),
+    points: Number(formData.get("points") || 5),
+    kidIds: formData.getAll("kidIds").map(Number),
+    cadence: String(formData.get("cadence") || "daily"),
+  });
+  revalidatePath("/parent/admin");
+}
+export async function updateAltAction(formData) {
+  await requireParent();
+  dom.updateAltChore(Number(formData.get("id")), {
+    name: String(formData.get("name") || "").trim() || "Chore",
+    emoji: String(formData.get("emoji") || "🔁"),
+    points: Number(formData.get("points") || 5),
+    kidIds: formData.getAll("kidIds").map(Number),
+    cadence: String(formData.get("cadence") || "daily"),
+  });
+  revalidatePath("/parent/admin");
+}
+export async function deleteAltAction(formData) {
+  await requireParent();
+  dom.deactivateAltChore(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+}
+
+// ---------- clone ----------
+export async function cloneTemplateAction(formData) {
+  await requireParent();
+  dom.cloneTemplate(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+}
+export async function cloneAltAction(formData) {
+  await requireParent();
+  dom.cloneAltChore(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+}
+export async function cloneBoardAction(formData) {
+  await requireParent();
+  dom.cloneBoardTask(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+  revalidatePath("/parent");
+}
+
 // ---------- admin: board ----------
 export async function addBoardAction(formData) {
   await requireParent();

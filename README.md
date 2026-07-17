@@ -13,6 +13,7 @@ A family chore tracker for the kids: they log chores, parents approve, everyone 
 
 - **Recurring chores** — assigned to specific kids, generated fresh **daily**. Each has its own per-chore streak 🔥. Missing a day breaks that streak (unless the day is *excused*).
 - **Board** — one-off tasks anyone can grab (just do → approve). No streaks.
+- **Alternating (rotating) chores** — shared jobs that hand off between a chosen set of kids. Parent picks the cadence per chore: **daily** (new kid each day), **on-completion** (baton passes when approved), or **weekly** (new kid each week). Shows "🔁 Your turn!" to the current kid and "Dotan's turn" to the others. Earns points, no streaks (it's a shared job). Daily/weekly rotation is deterministic from an anchor date; on-completion advances a stored pointer on approval.
 - **Points** — abstract, parent-set per chore. Balance = sum of approved earns. Points are a spendable balance (AbaBank will later convert & zero them).
 - **Excused days** — parent marks a kid (or the whole family) off for a date range: no chores generated, streaks frozen not broken.
 - **Immutability** — a completion snapshots its point value; changing a chore's points later only affects future completions. Chores are soft-deleted, never hard-deleted.
