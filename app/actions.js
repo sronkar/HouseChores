@@ -87,6 +87,8 @@ export async function addTemplateAction(formData) {
     points: Number(formData.get("points") || 5),
     kidIds: formData.getAll("kidIds").map(Number),
     streakAward: Number(formData.get("streak_award") || 0),
+    streakInterval: Number(formData.get("streak_interval") || 10),
+    streakStep: Number(formData.get("streak_step") || 1),
   });
   revalidatePath("/parent/admin");
 }
@@ -98,6 +100,8 @@ export async function updateTemplateAction(formData) {
     points: Number(formData.get("points") || 5),
     kidIds: formData.getAll("kidIds").map(Number),
     streakAward: Number(formData.get("streak_award") || 0),
+    streakInterval: Number(formData.get("streak_interval") || 10),
+    streakStep: Number(formData.get("streak_step") || 1),
   });
   revalidatePath("/parent/admin");
 }

@@ -34,8 +34,10 @@ function KidChecks({ kids, selected = [] }) {
   );
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }) {
   if (!(await isParent())) redirect("/parent");
+  const sp = await searchParams;
+  const tab = sp?.tab === "chores" ? "chores" : "kids";
 
   const kids = getKids();
   const templates = listTemplates();
@@ -51,6 +53,12 @@ export default async function AdminPage() {
         <h1 style={{ fontSize: 22 }}>Admin</h1>
       </div>
 
+      <div className="tabs">
+        <Link className={`tab ${tab === "kids" ? "active" : ""}`} href="/parent/admin?tab=kids">🧒 Kids</Link>
+        <Link className={`tab ${tab === "chores" ? "active" : ""}`} href="/parent/admin?tab=chores">🧹 Chores</Link>
+      </div>
+
+      {tab === "kids" && (<>
       {/* KIDS */}
       <div className="section-title">Kids</div>
       {kids.map((k) => (
@@ -85,7 +93,9 @@ export default async function AdminPage() {
           <button className="btn" type="submit">Add</button>
         </form>
       </div>
+      </>)}
 
+      {tab === "chores" && (<>
       {/* RECURRING */}
       <div className="section-title">Recurring chores (daily)</div>
       {templates.map((t) => (
@@ -96,7 +106,11 @@ export default async function AdminPage() {
               <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue={t.emoji} /></div>
               <div><label>Name</label><input type="text" name="name" defaultValue={t.name} /></div>
               <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue={t.points} min="0" /></div>
+            </div>
+            <div className="row">
               <div style={{ flex: "0 0 150px" }}><label>Streak award (0=off)</label><input type="number" name="streak_award" defaultValue={t.streak_award || 0} min="0" /></div>
+              <div style={{ flex: "0 0 130px" }}><label>every N days</label><input type="number" name="streak_interval" defaultValue={t.streak_interval || 10} min="1" /></div>
+              <div style={{ flex: "0 0 160px" }}><label>+bonus each N days</label><input type="number" name="streak_step" defaultValue={t.streak_step ?? 1} min="0" /></div>
             </div>
             <label>Who does it</label>
             <KidChecks kids={kids} selected={t.kidIds} />
@@ -123,7 +137,11 @@ export default async function AdminPage() {
             <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue="✅" /></div>
             <div><label>Name</label><input type="text" name="name" placeholder="e.g. Read" /></div>
             <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue="5" min="0" /></div>
+          </div>
+          <div className="row">
             <div style={{ flex: "0 0 150px" }}><label>Streak award (0=off)</label><input type="number" name="streak_award" defaultValue="0" min="0" /></div>
+            <div style={{ flex: "0 0 130px" }}><label>every N days</label><input type="number" name="streak_interval" defaultValue="10" min="1" /></div>
+            <div style={{ flex: "0 0 160px" }}><label>+bonus each N days</label><input type="number" name="streak_step" defaultValue="1" min="0" /></div>
           </div>
           <label>Who does it</label>
           <KidChecks kids={kids} />
@@ -213,7 +231,9 @@ export default async function AdminPage() {
           <button className="btn" type="submit">Post</button>
         </form>
       </div>
+      </>)}
 
+      {tab === "kids" && (<>
       {/* EXCUSED */}
       <div className="section-title">Excused days (freeze streaks — vacation, sick)</div>
       {excused.map((e) => (
@@ -258,6 +278,7 @@ export default async function AdminPage() {
           <button className="btn ghost" type="submit">Update</button>
         </form>
       </div>
+      </>)}
     </main>
   );
 }
