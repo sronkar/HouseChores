@@ -39,10 +39,20 @@ Default **parent PIN: `1234`** — change it in Parent → Admin.
 
 Placeholder kids are named "Kid A/B/C" — rename them (and set emoji/colour) in Parent → Admin.
 
+## AbaBank cash-out (wired)
+
+Parent → **🏛️ Bank** converts a kid's points to money and pushes it to AbaBank:
+
+1. Set the AbaBank **URL** + **ingest token** (matches AbaBank's `CHORES_INGEST_TOKEN`), **points-per-dollar**, and **currency**.
+2. **Map** each kid to their AbaBank user (exact name, or numeric id).
+3. **Cash out** → consumes the kid's points into a `conversion` row, marks the underlying `earn_event`s `consumed_by_bank`, and `POST`s to `POST /api/ingest/chore-payout`, which creates a **pending deposit** in AbaBank. You approve it once in the bank (approval = cash moves).
+
+The push is **idempotent** on `external_id`, so a failed conversion can be safely **retried** from the history list.
+
 ## Roadmap
 
 - [x] Core loop: profiles, recurring + board, log → approve → points → streaks, excused days, PIN admin
+- [x] Richer stats / history views
+- [x] Dedicated big-icon "picture mode" for the youngest
+- [x] AbaBank wiring (points → money, cash-out → pending deposit)
 - [ ] WhatsApp: debounced approval nudge to parents + reply-to-approve
-- [ ] Richer stats / history views
-- [ ] Dedicated big-icon "picture mode" for the youngest
-- [ ] AbaBank wiring (points → money, cash-out)

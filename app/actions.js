@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import * as dom from "@/lib/domain.js";
+import { postChorePayout } from "@/lib/bank.js";
 
 // ---------- kid loop ----------
 export async function doneAction(formData) {
@@ -138,6 +139,56 @@ export async function deleteExcusedAction(formData) {
   await requireParent();
   dom.deleteExcused(Number(formData.get("id")));
   revalidatePath("/parent/admin");
+}
+
+// ---------- AbaBank: config, mapping, cash-out ----------
+async function pushConversion(conv) {
+  const cfg = dom.getBankConfig();
+  const kid = dom.getKid(conv.kid_id);
+  const r = await postChorePayout({
+    url: cfg.url,
+    token: cfg.token,
+    externalId: conv.external_id,
+    ref: kid.ababank_ref,
+    amountCents: conv.amount_cents,
+    description: `Chore points: ${conv.points} pts (${kid.name})`,
+    points: conv.points,
+  });
+  dom.updateConversionResult(conv.id, {
+    status: r.ok ? "sent" : "failed",
+    ababankTxId: r.ok ? r.txId : null,
+    error: r.ok ? null : r.error,
+  });
+  return r;
+}
+
+export async function saveBankConfigAction(formData) {
+  await requireParent();
+  dom.setBankConfig({
+    url: String(formData.get("url") || ""),
+    token: String(formData.get("token") || ""),
+    pointsPerDollar: Number(formData.get("points_per_dollar") || 100),
+    currency: String(formData.get("currency") || "USD"),
+  });
+  revalidatePath("/parent/bank");
+}
+export async function setKidRefAction(formData) {
+  await requireParent();
+  dom.setKidAbabankRef(Number(formData.get("kidId")), String(formData.get("ref") || ""));
+  revalidatePath("/parent/bank");
+}
+export async function cashOutAction(formData) {
+  await requireParent();
+  const kidId = Number(formData.get("kidId"));
+  const r = dom.cashOut(kidId);
+  if (r.ok) await pushConversion(r.conversion);
+  revalidatePath("/parent/bank");
+}
+export async function retryConversionAction(formData) {
+  await requireParent();
+  const conv = dom.getConversion(Number(formData.get("id")));
+  if (conv && conv.status !== "sent") await pushConversion(conv);
+  revalidatePath("/parent/bank");
 }
 
 // ---------- admin: PIN ----------
