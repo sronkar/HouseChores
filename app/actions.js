@@ -86,6 +86,7 @@ export async function addTemplateAction(formData) {
     emoji: String(formData.get("emoji") || "✅"),
     points: Number(formData.get("points") || 5),
     kidIds: formData.getAll("kidIds").map(Number),
+    streakAward: Number(formData.get("streak_award") || 0),
   });
   revalidatePath("/parent/admin");
 }
@@ -96,6 +97,7 @@ export async function updateTemplateAction(formData) {
     emoji: String(formData.get("emoji") || "✅"),
     points: Number(formData.get("points") || 5),
     kidIds: formData.getAll("kidIds").map(Number),
+    streakAward: Number(formData.get("streak_award") || 0),
   });
   revalidatePath("/parent/admin");
 }

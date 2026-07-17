@@ -96,6 +96,7 @@ export default async function AdminPage() {
               <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue={t.emoji} /></div>
               <div><label>Name</label><input type="text" name="name" defaultValue={t.name} /></div>
               <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue={t.points} min="0" /></div>
+              <div style={{ flex: "0 0 150px" }}><label>Streak award (0=off)</label><input type="number" name="streak_award" defaultValue={t.streak_award || 0} min="0" /></div>
             </div>
             <label>Who does it</label>
             <KidChecks kids={kids} selected={t.kidIds} />
@@ -122,6 +123,7 @@ export default async function AdminPage() {
             <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue="✅" /></div>
             <div><label>Name</label><input type="text" name="name" placeholder="e.g. Read" /></div>
             <div style={{ flex: "0 0 100px" }}><label>Points</label><input type="number" name="points" defaultValue="5" min="0" /></div>
+            <div style={{ flex: "0 0 150px" }}><label>Streak award (0=off)</label><input type="number" name="streak_award" defaultValue="0" min="0" /></div>
           </div>
           <label>Who does it</label>
           <KidChecks kids={kids} />

@@ -68,7 +68,7 @@ export default async function ParentPage({ searchParams }) {
             <div className="tname">{t.emoji} {t.name}</div>
             <div className="meta">
               <span>{t.kid_name}</span>
-              <span className="pts">+{t.points_snapshot} pts</span>
+              <span className="pts">+{t.points_snapshot}{t.bonus > 0 ? ` +${t.bonus} 🎁` : ""} pts</span>
               <span>{t.source === "board" ? "board" : t.source === "alt" ? "🔁 rotating" : "daily"}</span>
             </div>
           </div>

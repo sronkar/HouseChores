@@ -23,6 +23,7 @@ function TaskRow({ t, kidId, showStreak }) {
         <div className="tname">{t.name}</div>
         <div className="meta">
           <span className="pts">+{t.points_snapshot} pts</span>
+          {t.bonus > 0 && <span className="bonus">🎁 +{t.bonus}</span>}
           {showStreak && t.status !== "missed" && (
             <span className="flame">🔥 {t.streak}</span>
           )}
