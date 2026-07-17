@@ -61,6 +61,7 @@ export async function addKidAction(formData) {
     name: String(formData.get("name") || "").trim() || "Kid",
     emoji: String(formData.get("emoji") || "🙂"),
     color: String(formData.get("color") || "#5b8def"),
+    toddler: formData.get("toddler") ? 1 : 0,
   });
   revalidatePath("/parent/admin");
 }
@@ -70,8 +71,10 @@ export async function updateKidAction(formData) {
     name: String(formData.get("name") || "").trim() || "Kid",
     emoji: String(formData.get("emoji") || "🙂"),
     color: String(formData.get("color") || "#5b8def"),
+    toddler: formData.get("toddler") ? 1 : 0,
   });
   revalidatePath("/parent/admin");
+  revalidatePath("/kid/" + Number(formData.get("id")));
 }
 
 // ---------- admin: recurring templates ----------

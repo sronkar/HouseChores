@@ -57,6 +57,9 @@ export default async function AdminPage() {
               <label>Color</label>
               <input type="text" name="color" defaultValue={k.color} />
             </div>
+            <div className="checks" style={{ flex: "0 0 auto", alignSelf: "center" }}>
+              <label><input type="checkbox" name="toddler" defaultChecked={!!k.toddler} /> 🧸 Toddler mode</label>
+            </div>
             <button className="btn ghost" type="submit">Save</button>
           </form>
         </div>
@@ -67,6 +70,9 @@ export default async function AdminPage() {
           <div style={{ flex: "0 0 80px" }}><label>Emoji</label><input type="text" name="emoji" defaultValue="🙂" /></div>
           <div><label>Name</label><input type="text" name="name" placeholder="Name" /></div>
           <div style={{ flex: "0 0 90px" }}><label>Color</label><input type="text" name="color" defaultValue="#5b8def" /></div>
+          <div className="checks" style={{ flex: "0 0 auto", alignSelf: "center" }}>
+            <label><input type="checkbox" name="toddler" /> 🧸 Toddler</label>
+          </div>
           <button className="btn" type="submit">Add</button>
         </form>
       </div>

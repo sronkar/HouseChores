@@ -41,6 +41,7 @@ export default async function ParentPage({ searchParams }) {
       <div className="topbar">
         <h1>👋 Parent</h1>
         <div style={{ display: "flex", gap: 8 }}>
+          <Link className="link-btn" href="/parent/history">History</Link>
           <Link className="link-btn" href="/parent/admin">Admin</Link>
           <Link className="link-btn" href="/">Home</Link>
           <form action={logoutAction}><button className="link-btn" type="submit">Lock</button></form>

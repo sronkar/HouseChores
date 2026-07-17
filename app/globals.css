@@ -126,3 +126,44 @@ input[type=text], input[type=number], input[type=date], input[type=password], se
 .list-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .list-item:last-child { border-bottom: none; }
 .grow { flex: 1 1 auto; min-width: 0; }
+
+/* stats */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+  padding: 18px; box-shadow: var(--shadow); text-align: center; }
+.tile-num { font-size: 30px; font-weight: 800; }
+.tile-label { color: var(--muted); font-size: 14px; font-weight: 700; margin-top: 4px; }
+
+.chart { display: flex; align-items: flex-end; gap: 10px; height: 160px; padding-top: 8px; }
+.chart-col { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+.chart-val { font-size: 13px; font-weight: 800; color: var(--brand); height: 18px; }
+.chart-bar { width: 70%; min-height: 4px; background: linear-gradient(180deg, #7aa5f2, var(--brand));
+  border-radius: 8px 8px 4px 4px; transition: height .2s; }
+.chart-x { font-size: 12px; color: var(--muted); font-weight: 700; margin-top: 6px; }
+
+/* toddler mode */
+.toddler .big-back { font-size: 30px; font-weight: 900; padding: 6px 22px; line-height: 1; }
+.thero { display: flex; align-items: center; gap: 14px; }
+.thero .kid-avatar { width: 60px; height: 60px; font-size: 32px; margin: 0; }
+.tbig-name { font-size: 30px; font-weight: 900; }
+.tstars { text-align: center; font-size: 34px; margin: 10px 0 22px; line-height: 1.3; }
+.tstars-num { font-size: 26px; font-weight: 900; color: #b9791a; vertical-align: middle; margin-left: 6px; }
+.tgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+.tcard-form { display: flex; }
+.tcard {
+  width: 100%; border: 3px solid var(--line); border-radius: 28px; background: var(--card);
+  box-shadow: var(--shadow); padding: 26px 16px 20px; text-align: center; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 210px;
+  justify-content: center; font-family: inherit; transition: transform .08s;
+}
+button.tcard:active { transform: scale(0.96); }
+button.tcard { border-color: var(--brand); }
+.temoji { font-size: 84px; line-height: 1; }
+.tname { font-size: 26px; font-weight: 900; color: var(--ink); }
+.ttap { font-size: 16px; color: var(--brand); font-weight: 800; }
+.tstate { font-size: 20px; font-weight: 900; }
+.tcard.tpending { border-color: #ffd97a; background: #fffaf0; }
+.tcard.tpending .tstate { color: #a9791a; }
+.tcard.tdone { border-color: var(--good); background: #eafaf1; }
+.tcard.tdone .tstate { color: #1f9a57; }
+.tcard.tdone .temoji, .tcard.tpending .temoji { opacity: .85; }
