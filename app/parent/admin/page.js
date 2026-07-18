@@ -12,6 +12,7 @@ import {
   addBoardAction, deleteTaskAction,
   updateBoardTemplateAction, deleteBoardTemplateAction, cloneBoardTemplateAction,
   addExcusedAction, deleteExcusedAction, setPinAction,
+  resetActivityAction,
 } from "@/app/actions.js";
 
 const CADENCES = [
@@ -357,6 +358,20 @@ export default async function AdminPage({ searchParams }) {
           <div><label>Change PIN (4–8 digits) — current: {pin}</label>
             <input type="text" name="pin" inputMode="numeric" placeholder="New PIN" /></div>
           <button className="btn ghost" type="submit">Update</button>
+        </form>
+      </div>
+
+      {/* DANGER ZONE */}
+      <div className="section-title" style={{ color: "var(--bad)" }}>Reset activity</div>
+      <div className="card" style={{ borderColor: "#f3c2c2" }}>
+        <p className="muted" style={{ marginTop: 0 }}>
+          Erases <b>all points, streaks, completion history, and cash-out records</b> for every kid.
+          Keeps your kids, chores, rotations, excused days, and PIN. This can’t be undone.
+        </p>
+        <form action={resetActivityAction} className="row">
+          <div><label>Type RESET to confirm</label>
+            <input type="text" name="confirm" placeholder="RESET" autoComplete="off" /></div>
+          <button className="btn bad" type="submit">Erase all activity</button>
         </form>
       </div>
       </>)}

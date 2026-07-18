@@ -278,6 +278,16 @@ export async function retryConversionAction(formData) {
   revalidatePath("/parent/bank");
 }
 
+// ---------- admin: reset activity ----------
+export async function resetActivityAction(formData) {
+  await requireParent();
+  if (String(formData.get("confirm") || "").trim().toUpperCase() === "RESET") {
+    dom.resetActivity();
+  }
+  revalidatePath("/parent/admin");
+  revalidatePath("/parent");
+}
+
 // ---------- admin: PIN ----------
 export async function setPinAction(formData) {
   await requireParent();
