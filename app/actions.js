@@ -14,6 +14,47 @@ export async function doneAction(formData) {
   revalidatePath(`/kid/${kidId}`);
 }
 
+export async function logActivityAction(formData) {
+  const activityId = Number(formData.get("activityId"));
+  const kidId = Number(formData.get("kidId"));
+  dom.logActivity(activityId, kidId);
+  revalidatePath(`/kid/${kidId}`);
+}
+
+// ---------- admin: activities ----------
+export async function addActivityAction(formData) {
+  await requireParent();
+  dom.addActivity({
+    name: String(formData.get("name") || "").trim() || "Activity",
+    emoji: String(formData.get("emoji") || "⭐"),
+    points: Number(formData.get("points") || 5),
+    kidIds: formData.getAll("kidIds").map(Number),
+    mode: String(formData.get("mode") || "daily"),
+  });
+  revalidatePath("/parent/admin");
+}
+export async function updateActivityAction(formData) {
+  await requireParent();
+  dom.updateActivity(Number(formData.get("id")), {
+    name: String(formData.get("name") || "").trim() || "Activity",
+    emoji: String(formData.get("emoji") || "⭐"),
+    points: Number(formData.get("points") || 5),
+    kidIds: formData.getAll("kidIds").map(Number),
+    mode: String(formData.get("mode") || "daily"),
+  });
+  revalidatePath("/parent/admin");
+}
+export async function deleteActivityAction(formData) {
+  await requireParent();
+  dom.deactivateActivity(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+}
+export async function cloneActivityAction(formData) {
+  await requireParent();
+  dom.cloneActivity(Number(formData.get("id")));
+  revalidatePath("/parent/admin");
+}
+
 // ---------- parent auth ----------
 const COOKIE = "hc_parent";
 export async function isParent() {

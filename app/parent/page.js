@@ -71,7 +71,7 @@ export default async function ParentPage({ searchParams }) {
             <div className="meta">
               <span>{t.kid_name}</span>
               <span className="pts">+{t.points_snapshot}{t.bonus > 0 ? ` +${t.bonus} 🎁` : ""} pts</span>
-              <span>{t.source === "board" ? "board" : t.source === "alt" ? "🔁 rotating" : "daily"}</span>
+              <span>{t.source === "board" ? "board" : t.source === "alt" ? "🔁 rotating" : t.source === "activity" ? "⭐ activity" : "daily"}</span>
             </div>
           </div>
           <form action={approveAction}>
