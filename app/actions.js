@@ -143,6 +143,12 @@ export async function deleteAltAction(formData) {
   dom.deactivateAltChore(Number(formData.get("id")));
   revalidatePath("/parent/admin");
 }
+export async function overrideAltAction(formData) {
+  await requireParent();
+  dom.setAltTodayOwner(Number(formData.get("altId")), Number(formData.get("kidId")));
+  revalidatePath("/parent");
+  revalidatePath("/parent/admin");
+}
 
 // ---------- clone ----------
 export async function cloneTemplateAction(formData) {

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { pendingQueue, familyOverview } from "@/lib/domain.js";
+import { pendingQueue, familyOverview, listAltChores, getKids, getKid } from "@/lib/domain.js";
 import {
   isParent, loginAction, logoutAction,
-  approveAction, rejectAction, approveAllAction,
+  approveAction, rejectAction, approveAllAction, overrideAltAction,
 } from "@/app/actions.js";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +35,8 @@ export default async function ParentPage({ searchParams }) {
 
   const pending = pendingQueue();
   const family = familyOverview();
+  const alts = listAltChores();
+  const kids = getKids();
 
   return (
     <main className="wrap">
@@ -82,6 +84,36 @@ export default async function ParentPage({ searchParams }) {
           </form>
         </div>
       ))}
+
+      {alts.length > 0 && (
+        <>
+          <div className="section-title">🔁 Rotating jobs today — override if needed</div>
+          {alts.map((a) => {
+            const owner = a.currentOwnerKidId ? getKid(a.currentOwnerKidId) : null;
+            const rotationKids = kids.filter((k) => a.kidIds.includes(k.id));
+            return (
+              <div className="task" key={a.id}>
+                <div className="emoji">{a.emoji}</div>
+                <div className="body">
+                  <div className="tname">{a.name}</div>
+                  <div className="meta">
+                    <span>today: {owner ? `${owner.emoji} ${owner.name}` : "—"}</span>
+                  </div>
+                </div>
+                <form action={overrideAltAction} style={{ display: "flex", gap: 8 }}>
+                  <input type="hidden" name="altId" value={a.id} />
+                  <select name="kidId" defaultValue={a.currentOwnerKidId || ""}>
+                    {rotationKids.map((k) => (
+                      <option key={k.id} value={k.id}>{k.emoji} {k.name}</option>
+                    ))}
+                  </select>
+                  <button className="btn ghost" type="submit">Set</button>
+                </form>
+              </div>
+            );
+          })}
+        </>
+      )}
 
       <div className="section-title">Family this week</div>
       {family.map((k) => (
