@@ -11,6 +11,7 @@ export async function doneAction(formData) {
   const taskId = Number(formData.get("taskId"));
   const kidId = Number(formData.get("kidId"));
   dom.markDone(taskId, kidId);
+  await dom.onPending();
   revalidatePath(`/kid/${kidId}`);
 }
 
@@ -18,6 +19,7 @@ export async function logActivityAction(formData) {
   const activityId = Number(formData.get("activityId"));
   const kidId = Number(formData.get("kidId"));
   dom.logActivity(activityId, kidId);
+  await dom.onPending();
   revalidatePath(`/kid/${kidId}`);
 }
 
@@ -83,16 +85,19 @@ export async function logoutAction() {
 export async function approveAction(formData) {
   await requireParent();
   dom.approveTask(Number(formData.get("taskId")));
+  dom.syncNudgeBaseline();
   revalidatePath("/parent");
 }
 export async function rejectAction(formData) {
   await requireParent();
   dom.rejectTask(Number(formData.get("taskId")));
+  dom.syncNudgeBaseline();
   revalidatePath("/parent");
 }
 export async function approveAllAction() {
   await requireParent();
   dom.approveAll();
+  dom.syncNudgeBaseline();
   revalidatePath("/parent");
 }
 
