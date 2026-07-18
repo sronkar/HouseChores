@@ -263,6 +263,7 @@ export default async function AdminPage({ searchParams }) {
                 <select name="mode" defaultValue={a.mode}>
                   <option value="daily">Every day (per kid)</option>
                   <option value="once">Once each (per kid)</option>
+                  <option value="once_global">Once total (first to claim)</option>
                 </select>
               </div>
             </div>

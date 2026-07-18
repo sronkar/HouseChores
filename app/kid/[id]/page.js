@@ -86,7 +86,8 @@ function ToddlerActivityCard({ a, kidId }) {
 function ToddlerView({ kid, assigned, alt = [], activities = [], balance }) {
   const stars = "⭐".repeat(Math.min(10, Math.max(0, Math.round(balance / 10))));
   const myTurns = alt.filter((o) => o.ownerKidId === kid.id && o.task && o.task.status !== "approved");
-  const cards = assigned.length + myTurns.length + activities.length;
+  const myActivities = activities.filter((a) => a.canLog || a.mine);
+  const cards = assigned.length + myTurns.length + myActivities.length;
   return (
     <main className="wrap toddler">
       <div className="topbar">
@@ -101,7 +102,7 @@ function ToddlerView({ kid, assigned, alt = [], activities = [], balance }) {
         {cards === 0 && <div className="empty">No chores today! 🎈</div>}
         {assigned.map((t) => <ToddlerCard key={t.id} t={t} kidId={kid.id} />)}
         {myTurns.map((o) => <ToddlerCard key={`a${o.alt.id}`} t={o.task} kidId={kid.id} />)}
-        {activities.map((a) => <ToddlerActivityCard key={`act${a.activity.id}`} a={a} kidId={kid.id} />)}
+        {myActivities.map((a) => <ToddlerActivityCard key={`act${a.activity.id}`} a={a} kidId={kid.id} />)}
       </div>
     </main>
   );
@@ -168,14 +169,14 @@ export default async function KidPage({ params }) {
       {activities.length > 0 && (
         <>
           <div className="section-title">⭐ Activities — earn extra points</div>
-          {activities.map(({ activity, status, canLog }) => (
+          {activities.map(({ activity, status, canLog, mine, claimer }) => (
             <div className="task" key={activity.id}>
               <div className="emoji">{activity.emoji}</div>
               <div className="body">
                 <div className="tname">{activity.name}</div>
                 <div className="meta">
                   <span className="pts">+{activity.points} pts</span>
-                  <span>{activity.mode === "once" ? "one-time" : "every day"}</span>
+                  <span>{activity.mode === "daily" ? "every day" : activity.mode === "once_global" ? "first to claim" : "one-time"}</span>
                 </div>
               </div>
               {canLog && (
@@ -185,9 +186,14 @@ export default async function KidPage({ params }) {
                   <button className="btn big" type="submit">Log it!</button>
                 </form>
               )}
-              {status === "pending" && <span className="pill pending">⏳ waiting</span>}
-              {status === "approved" && (
-                <span className="pill done">✓ {activity.mode === "once" ? "earned" : "today"}</span>
+              {claimer && (
+                <span className="pill" style={{ background: "#eceff5", color: "var(--muted)" }}>
+                  {claimer.emoji} {claimer.name} {status === "approved" ? "got it" : "claimed"}
+                </span>
+              )}
+              {mine && status === "pending" && <span className="pill pending">⏳ waiting</span>}
+              {mine && status === "approved" && (
+                <span className="pill done">✓ {activity.mode === "daily" ? "today" : "earned"}</span>
               )}
             </div>
           ))}
