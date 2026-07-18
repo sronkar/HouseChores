@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  getKids, listTemplates, listAltChores, listActivities, getBoard, listBoardTemplates, listExcused, getSetting,
+  getKids, listTemplates, listAltChores, listActivities, getBoard, listBoardTemplates, listExcused, getSetting, getNudgeConfig,
 } from "@/lib/domain.js";
 import {
   isParent,
@@ -13,7 +13,7 @@ import {
   addActivityAction, updateActivityAction, deleteActivityAction, cloneActivityAction,
   updateBoardTemplateAction, deleteBoardTemplateAction, cloneBoardTemplateAction,
   addExcusedAction, deleteExcusedAction, setPinAction,
-  resetActivityAction,
+  resetActivityAction, saveNudgeConfigAction, testNudgeAction,
 } from "@/app/actions.js";
 
 const CADENCES = [
@@ -71,6 +71,7 @@ export default async function AdminPage({ searchParams }) {
   const boardTemplates = listBoardTemplates();
   const excused = listExcused();
   const pin = getSetting("parent_pin");
+  const nudge = getNudgeConfig();
 
   return (
     <main className="wrap">
@@ -418,6 +419,35 @@ export default async function AdminPage({ searchParams }) {
           <div><label>Change PIN (4–8 digits) — current: {pin}</label>
             <input type="text" name="pin" inputMode="numeric" placeholder="New PIN" /></div>
           <button className="btn ghost" type="submit">Update</button>
+        </form>
+      </div>
+
+      {/* NOTIFICATIONS */}
+      <div className="section-title">Notifications</div>
+      <div className="card">
+        <form action={saveNudgeConfigAction}>
+          <div className="row">
+            <div style={{ flex: "0 0 200px" }}><label>Nudge me via</label>
+              <select name="channel" defaultValue={nudge.channel}>
+                <option value="off">Off</option>
+                <option value="ntfy">ntfy.sh push</option>
+              </select>
+            </div>
+            <div><label>ntfy topic (your private channel name)</label>
+              <input type="text" name="ntfyTopic" defaultValue={nudge.ntfyTopic} placeholder="e.g. housechores-a8f3q2" />
+            </div>
+            <div style={{ flex: "0 0 150px" }}><label>At most once per (min)</label>
+              <input type="number" name="minMinutes" defaultValue={nudge.minMinutes} min="1" />
+            </div>
+            <button className="btn ghost" type="submit">Save</button>
+          </div>
+        </form>
+        <p className="muted" style={{ fontSize: 14 }}>
+          Install the free <b>ntfy</b> app, subscribe to your topic, and you’ll get a push when chores are waiting.
+          The topic name is effectively a password — keep it unguessable.
+        </p>
+        <form action={testNudgeAction}>
+          <button className="btn" type="submit" disabled={nudge.channel !== "ntfy" || !nudge.ntfyTopic}>Send test push</button>
         </form>
       </div>
 

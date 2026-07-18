@@ -324,6 +324,26 @@ export async function retryConversionAction(formData) {
   revalidatePath("/parent/bank");
 }
 
+// ---------- admin: notifications ----------
+export async function saveNudgeConfigAction(formData) {
+  await requireParent();
+  dom.setNudgeConfig({
+    channel: String(formData.get("channel") || "off"),
+    ntfyTopic: String(formData.get("ntfyTopic") || "").trim(),
+    minMinutes: Math.max(1, Number(formData.get("minMinutes") || 25)),
+  });
+  revalidatePath("/parent/admin");
+}
+export async function testNudgeAction() {
+  await requireParent();
+  const cfg = dom.getNudgeConfig();
+  if (cfg.channel === "ntfy" && cfg.ntfyTopic) {
+    const { pushNtfy } = await import("@/lib/notify.js");
+    await pushNtfy(cfg.ntfyTopic, "HouseChores", "✅ Test nudge — notifications are working!");
+  }
+  revalidatePath("/parent/admin");
+}
+
 // ---------- admin: reset activity ----------
 export async function resetActivityAction(formData) {
   await requireParent();
