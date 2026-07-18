@@ -114,23 +114,27 @@ export async function deleteTemplateAction(formData) {
 // ---------- admin: alternating (rotating) chores ----------
 export async function addAltAction(formData) {
   await requireParent();
+  const todayKidId = formData.get("todayKidId");
   dom.addAltChore({
     name: String(formData.get("name") || "").trim() || "Chore",
     emoji: String(formData.get("emoji") || "🔁"),
     points: Number(formData.get("points") || 5),
     kidIds: formData.getAll("kidIds").map(Number),
     cadence: String(formData.get("cadence") || "daily"),
+    todayKidId: todayKidId ? Number(todayKidId) : null,
   });
   revalidatePath("/parent/admin");
 }
 export async function updateAltAction(formData) {
   await requireParent();
+  const todayKidId = formData.get("todayKidId");
   dom.updateAltChore(Number(formData.get("id")), {
     name: String(formData.get("name") || "").trim() || "Chore",
     emoji: String(formData.get("emoji") || "🔁"),
     points: Number(formData.get("points") || 5),
     kidIds: formData.getAll("kidIds").map(Number),
     cadence: String(formData.get("cadence") || "daily"),
+    todayKidId: todayKidId ? Number(todayKidId) : null,
   });
   revalidatePath("/parent/admin");
 }

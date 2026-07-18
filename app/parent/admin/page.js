@@ -185,11 +185,21 @@ export default async function AdminPage({ searchParams }) {
               <div><label>Name</label><input type="text" name="name" defaultValue={a.name} /></div>
               <div style={{ flex: "0 0 90px" }}><label>Points</label><input type="number" name="points" defaultValue={a.points} min="0" /></div>
             </div>
-            <label>Rotation cadence</label>
-            <select name="cadence" defaultValue={a.cadence}>
-              {CADENCES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
-            </select>
-            <label>Rotate between (in order)</label>
+            <div className="row">
+              <div><label>Rotation cadence</label>
+                <select name="cadence" defaultValue={a.cadence}>
+                  {CADENCES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
+                </select>
+              </div>
+              <div><label>Whose turn today</label>
+                <select name="todayKidId" defaultValue={a.currentOwnerKidId || ""}>
+                  {kids.filter((k) => a.kidIds.includes(k.id)).map((k) => (
+                    <option key={k.id} value={k.id}>{k.emoji} {k.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <label>Rotate between</label>
             <KidChecks kids={kids} selected={a.kidIds} />
             <div className="row" style={{ marginTop: 12, justifyContent: "flex-end" }}>
               <button className="btn ghost" type="submit">Save</button>
@@ -215,11 +225,20 @@ export default async function AdminPage({ searchParams }) {
             <div><label>Name</label><input type="text" name="name" placeholder="e.g. Walk the dog" /></div>
             <div style={{ flex: "0 0 90px" }}><label>Points</label><input type="number" name="points" defaultValue="5" min="0" /></div>
           </div>
-          <label>Rotation cadence</label>
-          <select name="cadence" defaultValue="daily">
-            {CADENCES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
-          </select>
-          <label>Rotate between (in order)</label>
+          <div className="row">
+            <div><label>Rotation cadence</label>
+              <select name="cadence" defaultValue="daily">
+                {CADENCES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
+              </select>
+            </div>
+            <div><label>Whose turn today (start)</label>
+              <select name="todayKidId" defaultValue="">
+                <option value="">First checked kid</option>
+                {kids.map((k) => <option key={k.id} value={k.id}>{k.emoji} {k.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <label>Rotate between</label>
           <KidChecks kids={kids} />
           <div className="row" style={{ marginTop: 12, justifyContent: "flex-end" }}>
             <button className="btn" type="submit">Add rotating chore</button>
